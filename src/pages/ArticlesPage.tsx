@@ -31,22 +31,21 @@ const ArticlesPage: React.FC = () => {
   const fetchArticles = useCallback(async () => {
     setLoading(true);
     try {
+      const categoryParam = category === "All" ? "" : `&category=${category}`;
       const response = await fetch(
-        `http://localhost:3001/articles?${
-          category !== "All" ? `category=${category}&` : ""
-        }page=${page}`
+        `http://localhost:3001/articles?page=${page}${categoryParam}`
       );
-      const data: Article[] = await response.json();
+      const data = await response.json();
 
       console.log("Fetched Data:", data);
 
-      if (!Array.isArray(data)) {
-        console.error("Unexpected API response format");
+      if (!data || !Array.isArray(data.articles)) {
+        console.error("Invalid API response format!", data);
         return;
       }
 
-      setArticles(data);
-      setTotalPages(1);
+      setArticles(data.articles);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching articles:", error);
       setArticles([]);
@@ -56,20 +55,11 @@ const ArticlesPage: React.FC = () => {
   }, [category, page]);
 
   useEffect(() => {
-    console.log("Fetching articles...");
     fetchArticles();
   }, [fetchArticles]);
 
-  useEffect(() => {
-    console.log("Articles state updated:", articles);
-  }, [articles]);
-
-  const handleCommentChange = () => {
-    fetchArticles();
-  };
-
   return (
-    <Container sx={{ py: 4 }}>
+    <Container sx={{ mt: 4 }}>
       <Filters
         selectedCategory={category}
         searchTerm={search}
@@ -78,32 +68,40 @@ const ArticlesPage: React.FC = () => {
       />
 
       {loading ? (
-        <Box sx={{ textAlign: "center", mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
       ) : articles.length === 0 ? (
-        <Typography variant="h6" sx={{ textAlign: "center", mt: 4 }}>
+        <Typography variant="h6" align="center" sx={{ mt: 4 }}>
           No articles found.
         </Typography>
       ) : (
-        <Box sx={{ mt: 4 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gap: 3,
+            mt: 4,
+          }}
+        >
           {articles.map((article) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              onCommentChange={handleCommentChange}
-            />
+            <ArticleCard key={article.id} article={article} />
           ))}
         </Box>
       )}
 
       {totalPages > 1 && (
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={(e, value) => setPage(value)}
-          sx={{ mt: 4, display: "flex", justifyContent: "center" }}
-        />
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(_, value) => {
+              console.log("Changing page to:", value);
+              setPage(value);
+            }}
+            sx={{ mt: 4, display: "flex", justifyContent: "center" }}
+          />
+        </Box>
       )}
     </Container>
   );
