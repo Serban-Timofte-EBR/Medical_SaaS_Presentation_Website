@@ -1,10 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Box, Container, Typography, Button, Grid } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const ComingSoonSection: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -54,9 +57,9 @@ const ComingSoonSection: React.FC = () => {
             fontSize: "1.1rem",
           }}
         >
-          Our upcoming AI-powered chatbot will guide you through the medical
-          system, offering personalized support for cancer patients and
-          prevention seekers alike. Get the help you need, fast!
+          Our AI-powered chatbot will guide you through the medical system,
+          offering personalized support for cancer patients and prevention
+          seekers alike. Get the help you need, fast!
         </Typography>
 
         {/* Highlights Section */}
@@ -98,21 +101,21 @@ const ComingSoonSection: React.FC = () => {
           variant="h4"
           sx={{ fontWeight: "bold", mt: 6, color: "#333" }}
         >
-          Launching Soon
+          Start Chatting Now
         </Typography>
         <Typography
           variant="h5"
           sx={{ fontWeight: "bold", mb: 4, color: "#e91e63" }}
         >
-          Be Ready!
+          Talk to Our AI Chatbot!
         </Typography>
 
-        {/* CTA Button */}
+        {/* CTA Button - Redirects to /gpt */}
         <Button
           variant="contained"
           color="primary"
           size="large"
-          href="#contact"
+          onClick={() => navigate("/gpt")}
           endIcon={<ArrowForwardIcon />}
           sx={{
             padding: "12px 30px",
@@ -124,7 +127,7 @@ const ComingSoonSection: React.FC = () => {
             },
           }}
         >
-          Get Notified
+          Go to Chat
         </Button>
       </Container>
     </Box>

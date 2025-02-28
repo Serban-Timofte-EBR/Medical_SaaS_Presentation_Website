@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -8,7 +9,6 @@ import {
   IconButton,
   Drawer,
   List,
-  ListItem,
   ListItemText,
   ListItemButton,
   Divider,
@@ -25,6 +25,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -42,7 +43,7 @@ const Header: React.FC = () => {
     };
 
   const navigationItems = [
-    { label: "Home", href: "#hero", icon: <HomeIcon /> },
+    { label: "Home", path: "/", icon: <HomeIcon /> }, // ✅ Updated to path `/`
     {
       label: "Scientific Articles",
       href: "#articles",
@@ -77,8 +78,11 @@ const Header: React.FC = () => {
         {navigationItems.map((item, index) => (
           <ListItemButton
             key={index}
-            component="a"
-            href={item.href}
+            onClick={() =>
+              item.path
+                ? navigate(item.path)
+                : (window.location.href = item.href!)
+            }
             sx={{
               color: "#333",
               "&:hover": {
@@ -109,7 +113,12 @@ const Header: React.FC = () => {
     <AppBar position="static" color="transparent" elevation={0}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Logo */}
-        <Typography variant="h6" color="primary">
+        <Typography
+          variant="h6"
+          color="primary"
+          onClick={() => navigate("/")}
+          sx={{ cursor: "pointer" }}
+        >
           E-OncoHub
         </Typography>
 
@@ -117,24 +126,28 @@ const Header: React.FC = () => {
         {!isMobile && (
           <Box sx={{ display: "flex", gap: "20px" }}>
             {navigationItems.map((item, index) => (
-              <Button key={index} href={item.href} color="inherit">
+              <Button
+                key={index}
+                onClick={() =>
+                  item.path
+                    ? navigate(item.path)
+                    : (window.location.href = item.href!)
+                }
+                color="inherit"
+              >
                 {item.label}
               </Button>
             ))}
           </Box>
         )}
 
-        {/* Call to Action */}
-        <Button variant="contained" color="primary">
-          <a
-            href="#features"
-            style={{
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            Get Started
-          </a>
+        {/* Log In Button */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/login")}
+        >
+          Log In
         </Button>
 
         {/* Menu icon for smaller screens */}
