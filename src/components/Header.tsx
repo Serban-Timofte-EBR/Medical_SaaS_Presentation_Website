@@ -21,6 +21,7 @@ import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import SearchIcon from "@mui/icons-material/Search";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
+import { useAuth } from "../context/AuthContext";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
@@ -29,6 +30,7 @@ const Header: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { user, logout } = useAuth();
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -43,7 +45,7 @@ const Header: React.FC = () => {
     };
 
   const navigationItems = [
-    { label: "Home", path: "/", icon: <HomeIcon /> }, // ✅ Updated to path `/`
+    { label: "Home", path: "/", icon: <HomeIcon /> },
     {
       label: "Scientific Articles",
       href: "#articles",
@@ -142,13 +144,29 @@ const Header: React.FC = () => {
         )}
 
         {/* Log In Button */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate("/login")}
-        >
-          Log In
-        </Button>
+        {user ? (
+          <Box sx={{ display: "flex", gap: "10px" }}>
+            <Typography variant="body1">Welcome, {user.email}</Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/login")}
+          >
+            Log In
+          </Button>
+        )}
 
         {/* Menu icon for smaller screens */}
         {isMobile && (

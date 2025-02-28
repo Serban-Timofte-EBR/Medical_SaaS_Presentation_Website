@@ -1,15 +1,10 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Container,
-  Paper,
-} from "@mui/material";
+import { TextField, Button, Box, Typography, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Login: React.FC = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,81 +18,47 @@ const Login: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
 
+      const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
 
-      localStorage.setItem("token", data.token);
+      login(data.token); // ✅ Store token & user info in context
       navigate("/gpt");
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
-      }
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred."
+      );
     }
   };
 
   return (
-    <Container maxWidth="xs">
-      <Paper
-        elevation={3}
-        sx={{
-          mt: 8,
-          mb: 25,
-          p: 4,
-          borderRadius: "12px",
-          backgroundColor: "#fff",
-          textAlign: "center",
-        }}
-      >
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: "bold", color: "#d6336c", mb: 2 }}
-        >
-          Welcome Back
-        </Typography>
-        <Typography sx={{ color: "#666", mb: 3 }}>
-          Enter your credentials to access your account.
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 5, p: 3, boxShadow: 3, borderRadius: 2 }}>
+        <Typography variant="h5" gutterBottom>
+          Log In
         </Typography>
 
-        {error && (
-          <Typography color="error" sx={{ mb: 2 }}>
-            {error}
-          </Typography>
-        )}
+        {error && <Typography color="error">{error}</Typography>}
 
         <TextField
           label="Email"
           fullWidth
           margin="normal"
-          variant="outlined"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          sx={{ borderRadius: "8px" }}
         />
         <TextField
           label="Password"
           type="password"
           fullWidth
           margin="normal"
-          variant="outlined"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          sx={{ borderRadius: "8px" }}
         />
-
         <Button
           variant="contained"
+          color="primary"
           fullWidth
-          sx={{
-            mt: 3,
-            backgroundColor: "#d6336c",
-            "&:hover": { backgroundColor: "#c02d60" },
-            fontWeight: "bold",
-            py: 1.5,
-            borderRadius: "8px",
-          }}
           onClick={handleLogin}
         >
           Log In
@@ -105,14 +66,9 @@ const Login: React.FC = () => {
 
         <Typography sx={{ mt: 2 }}>
           Don't have an account?{" "}
-          <Button
-            sx={{ color: "#d6336c", fontWeight: "bold" }}
-            onClick={() => navigate("/register")}
-          >
-            Register
-          </Button>
+          <Button onClick={() => navigate("/register")}>Register</Button>
         </Typography>
-      </Paper>
+      </Box>
     </Container>
   );
 };
