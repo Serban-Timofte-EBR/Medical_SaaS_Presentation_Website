@@ -2,13 +2,19 @@ import React, { useState } from "react";
 import {
   Card,
   CardContent,
-  Typography,
   CardActions,
+  Typography,
   Button,
+  Box,
+  Chip,
+  Divider,
   Collapse,
 } from "@mui/material";
-import CommentsSection from "./CommentsSection";
-import { useAuth } from "../context/AuthContext";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import CommentIcon from "@mui/icons-material/Comment";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import { format } from "date-fns";
+import CommentsSection from "./CommentsSection"; // ✅ Ensure this is imported
 
 interface Article {
   id: string;
@@ -19,52 +25,102 @@ interface Article {
   createdAt: string;
 }
 
-interface ArticleCardProps {
+interface Props {
   article: Article;
-  onCommentChange: () => void;
+  onCommentChange?: () => void;
 }
 
-const ArticleCard: React.FC<ArticleCardProps> = ({
-  article,
-  onCommentChange,
-}) => {
-  const { user } = useAuth();
-  const [expanded, setExpanded] = useState(false);
+const ArticleCard: React.FC<Props> = ({ article, onCommentChange }) => {
+  const [showComments, setShowComments] = useState(false);
 
   return (
-    <Card sx={{ mb: 3 }}>
+    <Card
+      sx={{
+        maxWidth: "100%",
+        mb: 3,
+        boxShadow: 3,
+        borderRadius: 3,
+        transition: "0.3s",
+        "&:hover": { boxShadow: 6 },
+      }}
+    >
       <CardContent>
-        <Typography variant="h5">{article.title}</Typography>
-        <Typography variant="body2" color="text.secondary">
+        {/* Category Chip */}
+        <Chip
+          label={article.category}
+          color="primary"
+          sx={{
+            mb: 1,
+            fontWeight: "bold",
+            backgroundColor: "#e91e63",
+            color: "white",
+          }}
+        />
+
+        {/* Title */}
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          {article.title}
+        </Typography>
+
+        {/* Summary */}
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
           {article.summary}
         </Typography>
-        <Typography variant="body2" sx={{ fontStyle: "italic", mt: 1 }}>
-          Category: {article.category}
-        </Typography>
-        <Typography variant="body2" color="gray">
-          Published: {new Date(article.createdAt).toLocaleDateString()}
-        </Typography>
-      </CardContent>
 
-      <CardActions>
-        <Button size="small" href={article.link} target="_blank">
-          Read More
-        </Button>
-        {user && (
-          <Button size="small" onClick={() => setExpanded(!expanded)}>
-            {expanded ? "Hide Comments" : "Show Comments"}
+        {/* Created Date */}
+        <Box
+          sx={{ display: "flex", alignItems: "center", color: "gray", mb: 2 }}
+        >
+          <AccessTimeIcon sx={{ fontSize: 18, mr: 1 }} />
+          <Typography variant="body2">
+            {format(new Date(article.createdAt), "MMM dd, yyyy")}
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Actions */}
+        <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Button
+            variant="outlined"
+            color="primary"
+            endIcon={<OpenInNewIcon />}
+            href={article.link}
+            target="_blank"
+            sx={{
+              borderRadius: 50,
+              fontWeight: "bold",
+              textTransform: "none",
+            }}
+          >
+            Read Full Article
           </Button>
-        )}
-      </CardActions>
 
-      {user && (
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <Button
+            variant="contained"
+            color="secondary"
+            endIcon={<CommentIcon />}
+            onClick={() => setShowComments(!showComments)} // ✅ Toggle comments visibility
+            sx={{
+              borderRadius: 50,
+              fontWeight: "bold",
+              textTransform: "none",
+              backgroundColor: "#e91e63",
+              "&:hover": { backgroundColor: "#d81b60" },
+            }}
+          >
+            {showComments ? "Hide Comments" : "View Comments"}
+          </Button>
+        </CardActions>
+
+        {/* Comments Section (Visible Only When Clicked) */}
+        <Collapse in={showComments}>
           <CommentsSection
             articleId={article.id}
             onCommentChange={onCommentChange}
           />
         </Collapse>
-      )}
+      </CardContent>
     </Card>
   );
 };
