@@ -22,7 +22,7 @@ const Login: React.FC = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
 
-      login(data.token); // ✅ Store token & user info in context
+      login(data.token);
       navigate("/gpt");
     } catch (err) {
       setError(
