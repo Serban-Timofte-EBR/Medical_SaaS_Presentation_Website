@@ -13,9 +13,38 @@ import {
 import { SelectChangeEvent } from "@mui/material/Select";
 import { styled } from "@mui/material/styles";
 
+const MessageBox = styled(Box)(({ theme }) => ({
+  padding: "15px 20px",
+  marginBottom: "10px",
+  borderRadius: "10px",
+  backgroundColor: theme.palette.grey[200],
+  maxWidth: "80%",
+  wordWrap: "break-word",
+}));
+
+const UserMessage = styled(MessageBox)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: "white",
+  marginLeft: "auto",
+  marginRight: 0,
+}));
+
+const BotMessage = styled(MessageBox)(({ theme }) => ({
+  backgroundColor: theme.palette.grey[300],
+  color: "black",
+  marginLeft: 0,
+  marginRight: "auto",
+}));
+
+// Define the message structure
+interface ChatMessage {
+  sender: "user" | "bot";
+  message: string;
+}
+
 const ChatbotPage: React.FC = () => {
   const [userMessage, setUserMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<string[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedClinic, setSelectedClinic] = useState<string>("");
@@ -62,8 +91,8 @@ const ChatbotPage: React.FC = () => {
       if (response.ok) {
         setChatHistory((prevHistory) => [
           ...prevHistory,
-          `User: ${userMessage}`,
-          `Bot: ${data.response}`,
+          { sender: "user", message: userMessage },
+          { sender: "bot", message: data.response },
         ]);
         setUserMessage("");
       } else {
@@ -95,8 +124,14 @@ const ChatbotPage: React.FC = () => {
     } else {
       setChatHistory((prevHistory) => [
         ...prevHistory,
-        `User: I want to schedule at ${selectedClinic} on ${selectedDate} at ${selectedTimeSlot}`,
-        `Bot: Your appointment at ${selectedClinic} on ${selectedDate} at ${selectedTimeSlot} has been scheduled!`,
+        {
+          sender: "user",
+          message: `I want to schedule at ${selectedClinic} on ${selectedDate} at ${selectedTimeSlot}`,
+        },
+        {
+          sender: "bot",
+          message: `Your appointment at ${selectedClinic} on ${selectedDate} at ${selectedTimeSlot} has been scheduled!`,
+        },
       ]);
       setScheduling(false);
     }
@@ -104,7 +139,10 @@ const ChatbotPage: React.FC = () => {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 4 }}>
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: "bold", mb: 4, textAlign: "center" }}
+      >
         Chat with the Breast Cancer Support Bot
       </Typography>
 
@@ -126,18 +164,36 @@ const ChatbotPage: React.FC = () => {
         </Button>
       </Box>
 
-      {loading && <Typography sx={{ mt: 2 }}>Sending...</Typography>}
+      {loading && (
+        <Typography sx={{ mt: 2, textAlign: "center" }}>Sending...</Typography>
+      )}
 
-      {error && <Typography color="error">{error}</Typography>}
+      {error && (
+        <Typography color="error" sx={{ textAlign: "center" }}>
+          {error}
+        </Typography>
+      )}
 
       <Box sx={{ mt: 4 }}>
-        <Typography variant="h6">Chat History</Typography>
-        <Box sx={{ mt: 2 }}>
-          {chatHistory.map((message, index) => (
-            <Typography key={index} sx={{ wordWrap: "break-word" }}>
-              {message}
-            </Typography>
-          ))}
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Chat History
+        </Typography>
+        <Box
+          sx={{
+            maxHeight: 300,
+            overflowY: "scroll",
+            padding: "10px",
+            backgroundColor: "#f1f1f1",
+            borderRadius: "10px",
+          }}
+        >
+          {chatHistory.map((message, index) =>
+            message.sender === "user" ? (
+              <UserMessage key={index}>{message.message}</UserMessage>
+            ) : (
+              <BotMessage key={index}>{message.message}</BotMessage>
+            )
+          )}
         </Box>
       </Box>
 
