@@ -21,7 +21,6 @@ const ArticlesSection: React.FC = () => {
     const fetchArticles = async () => {
       setLoading(true);
       try {
-        // Fetch the first page of articles with limit 3
         const response = await fetch(
           "http://localhost:3001/articles?page=1&limit=3"
         );

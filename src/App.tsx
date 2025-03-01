@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import { AuthProvider, useAuth } from "./context/AuthContext"; // ✅ Import AuthContext
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HeroSection from "./components/HeroSection";
@@ -16,7 +16,7 @@ import ArticlesSection from "./components/ArticlesSection";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ArticlesPage from "./pages/ArticlesPage";
-// import ChatbotPage from "./pages/ChatbotPage";
+import ChatbotPage from "./pages/ChatbotPage";
 import theme from "./styles/theme";
 
 const ProtectedRoute: React.FC<{ element: React.ReactNode }> = ({
@@ -60,10 +60,10 @@ const App: React.FC = () => {
               path="/blog"
               element={<ProtectedRoute element={<ArticlesPage />} />}
             />
-            {/* <Route
+            <Route
               path="/gpt"
               element={<ProtectedRoute element={<ChatbotPage />} />}
-            /> */}
+            />
           </Routes>
           <Footer />
         </Router>
