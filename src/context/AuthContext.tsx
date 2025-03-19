@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load user from token on mount
   useEffect(() => {
     if (token) {
-      const decodedUser = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      const decodedUser = JSON.parse(atob(token.split(".")[1]));
       setUser({
         id: decodedUser.id,
         email: decodedUser.email,
